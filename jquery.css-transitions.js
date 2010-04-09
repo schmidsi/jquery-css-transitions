@@ -99,7 +99,7 @@ var cssTransitions = window.cssTransitions = {
 var types = {
 	HOVER  : 1,
 	ACTIVE : 2
-}
+};
 
 //If IE, add event handlers to provide support for :hover and :active pseudo classes
 if($.browser.msie){
@@ -130,7 +130,7 @@ if($.browser.msie){
 								$this.addClass('temporary-ie-class').removeClass('temporary-ie-class');
 								if(selector.descendantSelector)
 									$this.find(selector.descendantSelector).addClass('temporary-ie-class').removeClass('temporary-ie-class');
-							}, 0)
+							}, 0);
 						};
 						
 						$this.hover(touchDOM, touchDOM);
@@ -225,7 +225,7 @@ else {
 			baseURL = this.src.replace(/[^\/]+$/, '');
 			return true;
 		}
-		return this.src.indexOf('jquery-css-transitions') == -1
+		return this.src.indexOf('jquery-css-transitions') == -1;
 	});
 	cssTransitions.bindingURL = baseURL + 'bindings.php';
 }
@@ -460,7 +460,7 @@ $(document.styleSheets).each(function(){
 						return function(){
 							//rule.style.MozBinding = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
 							rule.style[bindingPropertyName] = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
-						}
+						};
 					//}
 					//else {
 					//	return function(){
@@ -587,7 +587,7 @@ if(isXBL){
 	cssTransitions.bindingURL += "?count=" + ruleIndex;
 	$.get(cssTransitions.bindingURL, null, function(data, textStatus){
 		$(bindingAppliers).each(function(){
-			this()
+			this();
 		});
 	});
 }
