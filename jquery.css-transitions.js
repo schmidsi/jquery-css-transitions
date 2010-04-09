@@ -330,7 +330,7 @@ $(document.styleSheets).each(function(){
 			var name = animatableProperties[j];
 			
 			//Save the style associated with that name
-			if(that.style[name]) {
+			if(that.style[name] || that.style[name] === 0) {
 				ruleInfo.style[name] = that.style[name];
 			}
 		}
@@ -455,8 +455,7 @@ cssTransitions.applyRule = function(el, ruleIndex){
 	//Only transition the properties that were explicitly provided
 	else {
 		$(baseRule.transitionProperty).each(function(){
-			var name = this;
-			
+			var name = this.toString();
 			if(!el.style[name]) {
 				$el.css(name, $el.css(name));
 			}
