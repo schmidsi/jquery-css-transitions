@@ -109,6 +109,15 @@ var types = {
 	ACTIVE : 2
 };
 
+$.extend($.easing, {
+	"ease-in":     function (x, t, b, c, d) { return c*(t/=d)*t*t + b; },
+	"ease-out":    function (x, t, b, c, d) { return c*((t=t/d-1)*t*t + 1) + b; },
+	"ease-in-out": function (x, t, b, c, d) {
+		if ((t/=d/2) < 1) return c/2*t*t*t + b;
+		return c/2*((t-=2)*t*t + 2) + b;
+	}
+});
+
 //If IE, add event handlers to provide support for :hover and :active pseudo classes
 if($.browser.msie){
 	cssTransitions.refreshDOMForMSIE = function(){
@@ -232,7 +241,7 @@ $(document.styleSheets).each(function(){
 			style:{},
 			transitionProperty:['all'],
 			transitionDuration:0, //ms
-			transitionTimingFunction:'ease',
+			transitionTimingFunction:"linear",
 			transitionDelay:0, //ms
 			isBaseRule:false
 		};
@@ -295,7 +304,12 @@ $(document.styleSheets).each(function(){
 			//Parse "transition-timing-function:" (ease | linear | ease-in | ease-out | ease-in-out | cubic-bezier(<number>, <number>, <number>, <number>))
 			matches = ruleMatches[1].match(/transition-timing-function\s*:\s*(.+?)\s*(?:;|$)/i);
 			if(matches){
-				throw Error("'transition-timing-function:' is not currently supported");
+			  var easingMethodName = matches[1];
+			  if ($.easing[easingMethodName]) {
+          ruleInfo.transitionTimingFunction = easingMethodName;
+			  } else {
+          throw Error("'transition-timing-function:' only supports ease, linear, ease-in, ease-out, ease-in-out");
+  			}
 			}
 		}
 		//Bad rule
