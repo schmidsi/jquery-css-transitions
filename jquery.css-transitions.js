@@ -7,13 +7,20 @@
  *
  */
 
-(function(){
-var $ = jQuery;
+(function($){
 
-//Return of if CSS Transitions are supported natively
+// If we have Modernizr
+if (Modernizr && Modernizr.csstransitions) {
+  return;
+}
+
+// Return of if CSS Transitions are supported natively
 var test = $('<div style="-moz-transition-duration:1s; -webkit-transition-duration:1s; transition-duration:1s; -moz-binding:none; behavior:none; -ms-behavior:none;"></div>')[0];
-if(test.style.transitionDuration || test.style.mozTransitionDuration || test.style.webkitTransitionDuration)
+
+// Backup feature detection
+if(test.style.transitionDuration || test.style.mozTransitionDuration || test.style.webkitTransitionDuration) {
 	return;
+}
 
 //Get the CSS property name that is used by the browser
 var bindingPropertyName;
@@ -628,4 +635,4 @@ function regExpEscape(text) { //from Simon Willison <http://simonwillison.net/20
 }
 
 
-})(); //end scope
+})(jQuery); //end scope
