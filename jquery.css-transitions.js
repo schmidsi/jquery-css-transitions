@@ -37,8 +37,9 @@ else if(test.style.MsBehavior){ //for MSIE
 	bindingPropertyName = 'MsBehavior';
 	isHTC = true;
 }
-else //Quit since behaviors/bindings aren't supported
+else { //Quit since behaviors/bindings aren't supported
 	return;
+}
 
 //Not all of these are supported by jQuery, so additional jQuery animation plugins
 //  may beed to be included, such as jQuery Color Animations: http://plugins.jquery.com/project/color
@@ -120,11 +121,13 @@ if($.browser.msie){
 				var $this = $(this);
 				
 				//Don't assign hover event handler twice (store the decendent selectors in dictionary)
-				if(!$this.data('cssTransitionDescendantSelectors'))
+				if(!$this.data('cssTransitionDescendantSelectors')) {
 					$this.data('cssTransitionDescendantSelectors', {});
+				}
 				var data = $this.data('cssTransitionDescendantSelectors');
-				if(data[selector.descendantSelector] & selector.type)
+				if(data[selector.descendantSelector] & selector.type) {
 					return;
+				}
 				data[selector.descendantSelector] |= selector.type;
 				
 				//Attach the mutator to the appropriate event depending on the type of the pseudo class
@@ -135,8 +138,9 @@ if($.browser.msie){
 						var touchDOM = function(){
 							window.setTimeout(function(){
 								$this.addClass('temporary-ie-class').removeClass('temporary-ie-class');
-								if(selector.descendantSelector)
+								if(selector.descendantSelector) {
 									$this.find(selector.descendantSelector).addClass('temporary-ie-class').removeClass('temporary-ie-class');
+								}
 							}, 0);
 						};
 						
@@ -332,8 +336,9 @@ $(document.styleSheets).each(function(){
 				$(matches[1].split(/\s*,\s*/)).map(function(){
 					ruleInfo.transitionProperty.push(this.replace(/-([a-z])/, cssNameToJsNameCallback));
 				});
-				if(ruleInfo.transitionProperty[0] == 'none')
+				if(ruleInfo.transitionProperty[0] == 'none') {
 					continue; //return;
+				}
 			}
 			
 			//Parse "transition-duration:" which is in seconds or milliseconds
@@ -528,8 +533,9 @@ cssTransitions.applyRule = function(el, ruleIndex){
 			
 			//If no baseRule was found, then this selector is not associated with any transition; -1 means this
 			if(isNaN(baseRuleIndex)){
-				if(window.console && console.error)
+				if(window.console && console.error) {
 					console.error("No base match for ", el);
+				}
 				cssTransitions.baseRuleLookup[ruleIndex] = -1;
 				return;
 			}
@@ -541,15 +547,17 @@ cssTransitions.applyRule = function(el, ruleIndex){
 	var baseRule = cssTransitions.rules[baseRuleIndex];
 	var transitionStyle = {};
 
-	if(window.console && console.info)
+	if(window.console && console.info) {
 		console.info("CSS Transition Rule: " + rule.selectorText);
+	}
 
 	//Transition all properties
 	if(baseRule.transitionProperty[0] == 'all'){
 		for(var name in rule.style){
 			//Initialize the style state
-			if(!el.style[name])
+			if(!el.style[name]) {
 				$el.css(name, $el.css(name));
+			}
 			transitionStyle[name] = rule.style[name];
 		}
 	}
@@ -558,10 +566,12 @@ cssTransitions.applyRule = function(el, ruleIndex){
 		$(baseRule.transitionProperty).each(function(){
 			var name = this;
 			
-			if(!el.style[name])
+			if(!el.style[name]) {
 				$el.css(name, $el.css(name));
-			if(cssTransitions.rules[ruleIndex].style[name])
+			}
+			if(cssTransitions.rules[ruleIndex].style[name]) {
 				transitionStyle[name] = rule.style[name];
+			}
 		});
 		
 	}
