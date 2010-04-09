@@ -287,13 +287,13 @@ $(document.styleSheets).each(function(){
 			isBaseRule:false
 		};
 		
-		//@todo: Huge problem: that.selectorText may be different then the form used in the stylesheet (where the className appears or where the )
+		// @todo: Huge problem: that.selectorText may be different then the form used in the stylesheet (where the className appears or where the )
 		//If in the stylesheet there is the selector: .foo#bar.on.off.freak
 		//Then in Firefox it is stored as: #bar.foo.on.off.freak
 		//    But in MSIE it is stored as: .freak.off.on.foo#bar
 		//  One way to resolve this is to match by length; or to have a kind of signature which is composed of all of the characters used
 		if(jQuery.browser.msie){
-			ruleInfo.selectorText = ruleInfo.selectorText.replace(/((?:\.[a-z\-_]+?)+)(#\w+\S+)/ig, function(a,b,c){
+			ruleInfo.selectorText = ruleInfo.selectorText.replace(/((?:\.[a-z0-9\-_]+?)+)(#\w+\S+)/ig, function(a,b,c){
 				var classes = b.substr(1).split(/\./).reverse();
 				return c + '.' + classes.join('.');
 			});
