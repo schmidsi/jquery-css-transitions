@@ -236,7 +236,7 @@ $(document.styleSheets).each(function(){
 			isBaseRule:false
 		};
 		
-		// @todo: Huge problem: that.selectorText may be different then the form used in the stylesheet (where the className appears or where the )
+		// TODO: Huge problem: that.selectorText may be different then the form used in the stylesheet (where the className appears or where the )
 		//If in the stylesheet there is the selector: .foo#bar.on.off.freak
 		//Then in Firefox it is stored as: #bar.foo.on.off.freak
 		//    But in MSIE it is stored as: .freak.off.on.foo#bar
@@ -292,7 +292,7 @@ $(document.styleSheets).each(function(){
 			}
 			
 			//Parse "transition-timing-function:" (ease | linear | ease-in | ease-out | ease-in-out | cubic-bezier(<number>, <number>, <number>, <number>))
-			var matches = ruleMatches[1].match(/transition-timing-function\s*:\s*(.+?)\s*(?:;|$)/i);
+			matches = ruleMatches[1].match(/transition-timing-function\s*:\s*(.+?)\s*(?:;|$)/i);
 			if(matches){
 				throw Error("'transition-timing-function:' is not currently supported");
 			}
