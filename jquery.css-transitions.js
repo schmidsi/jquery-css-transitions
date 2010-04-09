@@ -191,7 +191,6 @@ else {
 }
 
 var bindingAppliers = [];
-var prefetchURLs = [];
 
 var ruleIndex = 0;
 $(document.styleSheets).each(function(){
@@ -282,7 +281,7 @@ $(document.styleSheets).each(function(){
 				//ruleInfo.transitionProperty.length = 0;
 				ruleInfo.transitionProperty = [];
 				$(matches[1].split(/\s*,\s*/)).map(function(){
-					ruleInfo.transitionProperty.push(this.replace(/-([a-z])/, cssNameToJsNameCallback));
+					ruleInfo.transitionProperty.push(this.replace(/-([a-z])/, function(c, b){ return b.toUpperCase(); }));
 				});
 				if(ruleInfo.transitionProperty[0] == 'none') {
 					continue; //return;
@@ -469,12 +468,16 @@ cssTransitions.applyRule = function(el, ruleIndex){
 	}
 	
 	var animate = function(){
-		$el.stop().animate(transitionStyle, baseRule.transitionDuration);
+	  if(window.console && console.info) {
+	  	console.info("Animating with timing function: " + baseRule.transitionTimingFunction);
+	  }
+	  
+		$el.stop().animate(transitionStyle, { duration: baseRule.transitionDuration, easing: baseRule.transitionTimingFunction });
 	};
 	
 	//Start animation after delay (and clear any pending delayed transition)
 	if(baseRule.transitionDelay){
-		window.setTimeout(animate, baseRule.transitionDelay);
+		window.setTimeout(animate);
 	}
 	//Execute the animation immediately
 	else {
@@ -492,10 +495,6 @@ if(isXBL){
 			this();
 		});
 	});
-}
-
-function cssNameToJsNameCallback(c, b){
-	return b.toUpperCase();
 }
 
 function regExpEscape(text) { //from Simon Willison <http://simonwillison.net/2006/Jan/20/escape/>
