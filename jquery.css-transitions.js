@@ -187,10 +187,11 @@ var prefetchURLs = [];
 var ruleIndex = 0;
 $(document.styleSheets).each(function(){
 	//Only do transitions for screen media
-	for(var i = 0; i < this.media.length; i++){
-		var media = this.media.item ? this.media.item(i) : this.media;
-		if(media && media != 'screen' && media != 'all')
+	for(var k = 0; k < this.media.length; k++){
+		var media = this.media.item ? this.media.item(k) : this.media;
+		if(media && media != 'screen' && media != 'all') {
 			return;
+		}
 	}
 	
 	//We actually have to load the stylesheet in via XHR (inspired by moofx)
