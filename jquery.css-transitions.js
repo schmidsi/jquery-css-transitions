@@ -149,66 +149,6 @@ if($.browser.msie){
 					
 					case types.ACTIVE:
 						$this.mousedown(touchDOM).mouseup(touchDOM); //this isn't doing it; we'll need to explicitly run the selector 
-						
-						////Manually apply the selector to the elements on the page
-						//$this.mousedown(function(){
-						//	//Only apply :active rule if another :active rule hasn't already been applied or if the previously applied :active
-						//	//  rule's index is less than this selector's rule's index
-						//	//  (QUESTION: How is cascade being computed? We should allow it to override if rule index is greater)
-						//	if(selector.descendantSelector){
-						//		$this.find(selector.descendantSelector).each(function(){
-						//			var history = $(this).data('cssTransitionRuleIndexHistory');
-						//			if(!history || cssTransitions.rules[history[0]].selectorText.indexOf(':active') == -1){
-						//				if(history){
-						//					if(selector.ruleIndex > history[0]){
-						//						cssTransitions.applyRule(this, selector.ruleIndex);
-						//						$(this).data('cssTransitionRuleNonActiveRuleIndex', history[0]);
-						//					}
-						//				}
-						//				else {
-						//					cssTransitions.applyRule(this, selector.ruleIndex);
-						//				}
-						//				
-						//			}	
-						//		});
-						//	}
-						//	else {
-						//		var history = $this.data('cssTransitionRuleIndexHistory');
-						//		if(!history || cssTransitions.rules[history[0]].selectorText.indexOf(':active') == -1){
-						//			if(history){
-						//				if(selector.ruleIndex > history[0]){
-						//					cssTransitions.applyRule(this, selector.ruleIndex);
-						//					$this.data('cssTransitionRuleNonActiveRuleIndex', history[0]);
-						//				}
-						//			}
-						//			else {
-						//				cssTransitions.applyRule(this, selector.ruleIndex);
-						//			}
-						//		}
-						//	}
-						//})
-						////Unapply the applied :active selector
-						//.mouseup(function(){
-						//	//Apply the previous non-:active rule (stored in data cssTransitionRuleNonActiveRuleIndex)
-						//	if(selector.descendantSelector){
-						//		$this.find(selector.descendantSelector).each(function(){
-						//			var previousRuleIndex = $(this).data('cssTransitionRuleNonActiveRuleIndex');
-						//			if(!previousRuleIndex)
-						//				return;
-						//			$(this).removeData('cssTransitionRuleNonActiveRuleIndex');
-						//			cssTransitions.applyRule(this, previousRuleIndex);
-						//		});
-						//	}
-						//	else {
-						//		var previousRuleIndex = $this.data('cssTransitionRuleNonActiveRuleIndex');
-						//		if(!previousRuleIndex)
-						//			return;
-						//		$(this).removeData('cssTransitionRuleNonActiveRuleIndex');
-						//		cssTransitions.applyRule(this, previousRuleIndex);
-						//	}
-						//	
-						//});
-						//break;
 				}
 			});
 			
@@ -259,8 +199,6 @@ $(document.styleSheets).each(function(){
 	switch(el.nodeName.toLowerCase()){
 		case 'style':
 			return; //does not work with inline styles because IE doesn't allow you to get the text content of a STYLE element
-			sheetCssText = el.innerHTML;
-			break;
 		case 'link':
 			var xhr = $.ajax({
 				url:el.href,
@@ -372,46 +310,16 @@ $(document.styleSheets).each(function(){
 			});
 			ruleInfo.isBaseRule = true;
 		}
-		
-		//Instead of this, I was going to have 
-		//Save the transition property and duration in the target element so that it can cascade
-		//if(ruleInfo.transitionProperty || ruleInfo.transitionDuration){
-		//	//Try because some selectors are not supported by jQuery (e.g. the pseudo classes)
-		//	try {
-		//		var els = jQuery(that.selectorText);
-		//		if(ruleInfo.transitionProperty.length){
-		//			els.data('transitionProperty', ruleInfo.transitionProperty);
-		//		}
-		//		if(ruleInfo.transitionDuration){
-		//			els.data('transitionDuration', ruleInfo.transitionDuration);
-		//		}
-		//	}
-		//	catch(e){
-		//		if(window.console)
-		//			console.error("Unable to use selector: " + that.selectorText);
-		//	}
-		//}
 
 		//Store all of the styles in this rule so that they can be accessed by the bindings later
 		for(var j = 0; j < animatableProperties.length; j++){
 			var name = animatableProperties[j];
 			
 			//Save the style associated with that name
-			if(that.style[name])
+			if(that.style[name]) {
 				ruleInfo.style[name] = that.style[name];
+			}
 		}
-		
-		//(The following doesn't work in IE) Store all of the styles in this rule so that they can be accessed by the bindings later
-		//for(var j = 0; that.style[j]; j++){
-		//	//Convert the name from CSS format to JavaScript format and change make any additional name changes
-		//	var name = that.style[j].replace(/-([a-z])/g, cssNameToJsNameCallback);
-		//	if(name == 'paddingLeftValue' || name == 'paddingRightValue')
-		//		name = name.replace(/Value$/, '');
-		//	
-		//	//Save the style associated with that name
-		//	if(that.style[name])
-		//		ruleInfo.style[name] = that.style[name];
-		//}
 
 		//Store this rule and associate it with this ruleIndex (so that the binding can call up the rule that it was part of)
 		cssTransitions.rules[ruleIndex] = ruleInfo;
@@ -439,13 +347,11 @@ $(document.styleSheets).each(function(){
 			}
 		}
 		
-		
 		//Create a function for adding a binding to this rule; this function is called once the binding XML file is successfully loaded in order to avoid flash of unstyled content
 		//To avoid using external files altogether, it would be best if we could assign the behaviors to :url("javascript:cssTransitions.applyRule(this, ' + i + '); void(0);")
 		//Or we can do this: behavior:expression("")
 		if(isHTC){
 			var url = cssTransitions.bindingURL + "?rule=" + ruleIndex;
-			//var url = cssTransitions.bindingURL + "/rule/" + ruleIndex; //do this to help ensure it is cached
 			//Loathing the fact that IE apparently doesn't implement setExpression on a CSSStyleRule's CSSStyleDeclaration "style" object
 			that.style[bindingPropertyName] = 'url("' + url + '")';
 			
@@ -454,33 +360,15 @@ $(document.styleSheets).each(function(){
 			//In order to successfully cache the behavior, we have to attach the behavior to a temporary element that is thrown away
 			var span = document.createElement('span');
 			span.style[bindingPropertyName] = that.style[bindingPropertyName];
-			
-			//If Gears is available, we could store the file in a LocalServer but this would cause there to be a dialog box
-			//that.style[bindingPropertyName] = 'url("javascript://alert(1); void(0);")';
-			//that.style.setExpression('width', "cssTransitions.applyRule(this, " + i + ")");
-			//that.style.setExpression(bindingPropertyName, "cssTransitions.applyRule(this, " + i + ")");
-			//if we reference an HTML page will it avoid refreshing?
-			//is there really no way to put multiple behaviors in one file?
-			//The only way that we can use expressions is if we statically put something in the rule like:
-			//  unusedProperty:expression("notifyAppliedRule(rule.selectorText))")
 		}
 		else {
 
 			bindingAppliers.push(
 				(function(rule, i){
-					//if(isXBL){
-						return function(){
-							//rule.style.MozBinding = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
-							rule.style[bindingPropertyName] = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
-						};
-					//}
-					//else {
-					//	return function(){
-					//		//rule.style.MozBinding = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
-					//		console.warn("url('" + cssTransitions.bindingURL + "&rule=" + i + "')");
-					//		rule.style.binding = "url('" + cssTransitions.bindingURL + "&rule=" + i + "')";
-					//	}
-					//}
+					return function(){
+						//rule.style.MozBinding = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
+						rule.style[bindingPropertyName] = "url('" + cssTransitions.bindingURL + "#rule" + i + "')";
+					};
 				})(that, ruleIndex)
 			);
 		}
@@ -493,12 +381,6 @@ $(document.styleSheets).each(function(){
 //Function which is called by the behaviors whenever one is constructed
 cssTransitions.applyRule = function(el, ruleIndex){
 	var $el = $(el);
-	//if(!$el.data('cssTransitionRuleIndexHistory'))
-	//	$el.data('cssTransitionRuleIndexHistory', []);
-	//$el.data('cssTransitionRuleIndexHistory').unshift(ruleIndex); //store this for :active support
-	//for MSIE, if an :active rule has been applied, don't proceed until the mouseup has been executed
-	//if($el.data('cssTransitionRuleNonActiveRuleIndex'))
-	//	return;
 	
 	var baseRuleIndex;
 	if(cssTransitions.rules[ruleIndex].isBaseRule){
@@ -508,17 +390,12 @@ cssTransitions.applyRule = function(el, ruleIndex){
 	else {
 		baseRuleIndex = cssTransitions.baseRuleLookup[ruleIndex];
 		//If a baseRuleIndex is -1, then it's already been determined to not exist
-		if(baseRuleIndex == -1)
+		if(baseRuleIndex == -1) {
 			return;
+		}
 		//Find the base rule for this element; this allows elements to be inserted dynamically!
 		else if(isNaN(baseRuleIndex)){
 			$(cssTransitions.baseRules).each(function(){
-				//The following will not work because: Only simple expressions are supported. Complex expressions,
-				//   such as those containing hierarchy selectors (such as +, ~, and >) will always return 'true'.
-				//if($el.is(baseRule.selector)){
-				//	baseRuleIndex = cssTransitions.rules[baseRule.index];
-				//}
-				
 				//Iterate over each of elements that match the selector, and see if they match this element; if so, then this selector's baseRule should be applied to this
 				//   We should cache these queries and only delete them when MutationEvents occur
 				//   Note: Two rules may have the same selector
@@ -582,19 +459,12 @@ cssTransitions.applyRule = function(el, ruleIndex){
 	
 	//Start animation after delay (and clear any pending delayed transition)
 	if(baseRule.transitionDelay){
-		//window.clearTimeout($el.data('transitionDelayTimer'));
-		//$el.data('transitionDelayTimer', window.setTimeout(animate, baseRule.transitionDelay));
 		window.setTimeout(animate, baseRule.transitionDelay);
 	}
 	//Execute the animation immediately
 	else {
 		animate();
 	}
-	
-	//#### We really should find out when a binding is REMOVED
-	//document.defaultView.getComputedStyle($('#foo')[0], null).MozBinding
-	//We does this only return 1? It should return a list of bindings that are applied!
-	//We need to get all of the bindings that are applied in the cascade
 };
 
 
@@ -608,29 +478,11 @@ if(isXBL){
 		});
 	});
 }
-//Only prefetch if IE 8 because IE 7 cannot cache HTC files (huge problem) (TODO)
-//"Internet Explorer contains several caching bugs; it often fails to cache pages that are served with gzip compression (used
-//   by many, many sites, including Google, this site, all sites hosted by Dreamhosts, etc etc etc). It usually fails to cache
-//   .htc behaviour files, or images/CSS/JavaScript files that are loaded as a result of running a .htc file, and will often load them once
-//   for every element they apply to, and again every time the mouse moves over them. This can result in hundreds of extra requests for a
-//   single page (400 per visitor on one of my pages, until I removed the behaviour), and as a result, Internet Explorer can look far more
-//   popular than it actually is." <http://www.howtocreate.co.uk/nostats.html>
-// See: http://support.microsoft.com/kb/319176
-//else if(isHTC /*&& $.browser.msie && parseFloat($.browser.version) >= 8*/){
-//	$(prefetchURLs).each(function(){
-//		$.get(this);
-//	});
-//}
-
 
 function cssNameToJsNameCallback(c, b){
 	return b.toUpperCase();
-	
-	if(c[1])
-		return c[1].toUpperCase();
-	else
-		return c.toUpperCase();
 }
+
 function regExpEscape(text) { //from Simon Willison <http://simonwillison.net/2006/Jan/20/escape/>
   if (!arguments.callee.sRE) {
     var specials = [
